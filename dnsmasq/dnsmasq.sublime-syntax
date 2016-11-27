@@ -1,0 +1,229 @@
+%YAML 1.2
+---
+name: dnsmasq
+file_extensions:
+  # These are non-standard extensions, but used to prevent conflicts with the common `.conf`.
+  # This syntax can be specified per-project with the `Project Specific Syntax Settings` package.
+  - dnsm
+  - dnsmasq
+scope: source.dnsmasq
+variables:
+  comment_eol: \s+#|$
+  comma_comment_eol: ',|{{comment_eol}}'
+  slash_comment_eol: '/|{{comment_eol}}'
+  slash_comma_comment_eol: '/|,|{{comment_eol}}'
+  escape_chars: '\\\\(?:\\\\|"|t|e|b|r|n)'
+  domain: (?:\.?[[:alnum:]](?:[[:alnum:]-]*\.[[:alnum:]-]+)?)+
+  option: all-servers|bind-(?:dynamic|interfaces)|bogus-priv|clear-on-reload|conntrack|dhcp-(?:authoritative|client-update|fqdn|no-override|sequential-ip)|dns(?:-loop-detect|sec(?:-check-unsigned|debug|no-timecheck)?)|domain-needed|enable-ra|expand-hosts|filterwin2k|help(?:\ dchp6?)?|keep-in-foreground|leasefile-ro|local(?:-service|ise-queries|mx)|log-dhcp|no-(?:daemon|hosts|negcache|ping|poll|resolv)|proxy-dnssec|quiet-(?:dhcp6?|ra)|read-ethers|rebind-localhost-ok|script-arp|selfmx|stop-dns-rebind|strict-order|test|tftp-(?:lowercase|no-(?:blocksize|fail)|secure|unique-root)|version
+  parameter: add-(?:cpe-id|subnet)|addn-hosts|alias|auth-(?:peer|sec-servers|server|soa|ttl|zone)|bogus-nxdomain|bootp-dynamic|bridge-interface|cache-size|cname|conf-(?:dir|file)|dhcp-(?:alternate-port|boot|broadcast|circuitid|duid|generate-names|host(?:s(?:dir|file))?|ignore(?:-names)?|lease(?:-max|file)|luascript|mac|match|option(?:-force)?|opts(?:dir|file)|proxy|range|relay|remoteid|script(?:user)?|subscrid|ttl|(?:user|vendor)class)|dns(?:-(?:forward-max|rr)|sec-timestamp)|domain|edns-packet-max|enable-(?:dbus|tftp)|except-interface|group|host(?:-record|sdir)|ignore-address|interface(?:-name)?|ipset|listen-address|local-ttl|log-(?:async|facility|queries)|max-(?:(?:cache-)?ttl|port)|min-(?:cache-ttl|port)|mx-(?:host|target)|naptr-record|neg-ttl|no-dhcp-interface|pid-file|port|ptr-record|pxe(?:-prompt|service)|query-port|ra-param|rebind-domain-ok|resolv-file|rev-server|servers-file|srv-host|synth-domain|tag-if|tftp-(?:max|mtu|port-range|root)|trust-anchor|txt-record|user
+  parameter_server: address|local|server
+  ipv4_addr: (?:[[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}
+  ipv4_mask: (/)([[:digit:]]|[1-2][[:digit:]]|3[0-2])
+  ipv6cs1: '[[:digit:]A-Fa-f]{1,4}'
+  ipv6cs2: 25[0-5]|2[0-4]d|1dd|[1-9]?d
+  ipv6_addr: (?:(?:{{ipv6cs1}}:){7}(?:{{ipv6cs1}}|:))|(?:(?:{{ipv6cs1}}:){6}(?::{{ipv6cs1}}|(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3})|:))|(?:(?:{{ipv6cs1}}:){5}(?:(?:(?::{{ipv6cs1}}){1,2})|:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3})|:))|(?:(?:{{ipv6cs1}}:){4}(?:(?:(?::{{ipv6cs1}}){1,3})|(?:(?::{{ipv6cs1}})?:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?:(?:{{ipv6cs1}}:){3}(?:(?:(?::{{ipv6cs1}}){1,4})|(?:(?::{{ipv6cs1}}){0,2}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?:(?:{{ipv6cs1}}:){2}(?:(?:(?::{{ipv6cs1}}){1,5})|(?:(?::{{ipv6cs1}}){0,3}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?:(?:{{ipv6cs1}}:){1}(?:(?:(?::{{ipv6cs1}}){1,6})|(?:(?::{{ipv6cs1}}){0,4}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?::(?:(?:(?::{{ipv6cs1}}){1,7})|(?:(?::{{ipv6cs1}}){0,5}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))
+  ipv6_mask: (/)([[:digit:]]|[1-9][[:digit:]]|1[0-1][[:digit:]]|12[0-8])
+  ipv6_zone: (%)([[:alnum:]]+)
+
+contexts:
+  main:
+    - include: comment
+    - include: parameter
+    - include: parameter-server
+    - include: option
+    - include: invalid-option-parameter
+
+  comment:
+    - match: \#
+      scope: punctuation.definition.comment.dnsmasq
+      push:
+        - meta_scope: comment.line.dnsmasq
+        - match: $
+          pop: true
+
+  invalid-option-parameter:
+    - match: ^.+?(?==|{{comment_eol}})
+      scope: invalid.illegal.option-parameter.dnsmasq
+      push:
+        - match: (?={{comment_eol}})
+          pop: true
+        - match: \=
+          scope: keyword.operator.assignment.dnsmasq
+          pop: true
+
+  option:
+    - match: ^(?:{{option}})(?={{comment_eol}})
+      scope: entity.name.tag.dnsmasq
+
+  parameter:
+    - match: ^({{parameter}})(?==|{{comment_eol}})
+      captures:
+        1: entity.name.tag.dnsmasq
+      push:
+        - match: (?={{comment_eol}})
+          pop: true
+        - match: \=
+          scope: keyword.operator.assignment.dnsmasq
+          push:
+            - meta_content_scope: meta.parameter-value.dnsmasq
+            - match: (?={{comment_eol}})
+              pop: true
+            - match: \,
+              scope: invalid.illegal.stray-parameter-separator.dnsmasq
+            - include: parameter-value
+
+  parameter-value:
+    - match: |-
+        (?x:
+          ({{ipv4_addr}})(?:{{ipv4_mask}})?|
+          ({{ipv6_addr}})(?:{{ipv6_zone}})?(?:{{ipv6_mask}})?|
+          ((")(({{escape_chars}})|[^"])*("))|
+          ((')([^']*)('))|
+          ([[:digit:]]+(?:\.[[:digit:]]+)+)|
+          ([[:digit:]]+)|
+          ([^,"']+?)
+        )(?={{comma_comment_eol}})
+      captures:
+        # ipv4
+        1: constant.numeric.integer.dnsmasq
+        2: punctuation.separator.ip.mask.dnsmasq
+        3: constant.numeric.integer.dnsmasq
+        # ipv6
+        4: constant.numeric.integer.long.hexadecimal.dnsmasq
+        5: punctuation.separator.ip.ipv6.zone.dnsmasq
+        6: entity.other.attribute-name.dnsmasq
+        7: punctuation.separator.ip.mask.dnsmasq
+        8: constant.numeric.integer.dnsmasq
+        # double-quote string
+        9: string.quoted.double.dnsmasq
+        10: punctuation.definition.string.begin.dnsmasq
+        11: meta.string-contents.quoted.double.dnsmasq
+        12: constant.character.escape.dnsmasq
+        13: punctuation.definition.string.end.dnsmasq
+        # single-quote string
+        14: string.quoted.single.dnsmasq
+        15: punctuation.definition.string.begin.dnsmasq
+        16: meta.string-contents.quoted.single.dnsmasq
+        17: punctuation.definition.string.end.dnsmasq
+        # float
+        18: constant.numeric.float.dnsmasq
+        # int
+        19: constant.numeric.integer.dnsmasq
+        # unquoted-string
+        20: string.unquoted.dnsmasq
+      push:
+        - match: (,)?(?={{comment_eol}})
+          captures:
+            1: invalid.illegal.stray-parameter-separator.dnsmasq
+          pop: true
+        - include: parameter-value-repeat
+
+  parameter-value-repeat:
+    - match: \,
+      scope: punctuation.separator.parameter.dnsmasq
+      push:
+        - match: |-
+            (,+)?\s*(?x:
+              ({{ipv4_addr}})(?:{{ipv4_mask}})?|
+              ({{ipv6_addr}})(?:{{ipv6_zone}})?(?:{{ipv6_mask}})?|
+              ((")(({{escape_chars}})|[^"])*("))|
+              ((')([^']*)('))|
+              ([[:digit:]]+(?:\.[[:digit:]]+)+)|
+              ([[:digit:]]+)|
+              ([^,"']+?)
+            )(?={{comma_comment_eol}})
+          captures:
+            # stray-separator
+            1: invalid.illegal.stray-parameter-separator.dnsmasq
+            # ipv4
+            2: constant.numeric.integer.dnsmasq
+            3: punctuation.separator.ip.mask.dnsmasq
+            4: constant.numeric.integer.dnsmasq
+            # ipv6
+            5: constant.numeric.integer.long.hexadecimal.dnsmasq
+            6: punctuation.separator.ip.ipv6.zone.dnsmasq
+            7: entity.other.attribute-name.dnsmasq
+            8: punctuation.separator.ip.mask.dnsmasq
+            9: constant.numeric.integer.dnsmasq
+            # double-quote string
+            10: string.quoted.double.dnsmasq
+            11: punctuation.definition.string.begin.dnsmasq
+            12: meta.string-contents.quoted.double.dnsmasq
+            13: constant.character.escape.dnsmasq
+            14: punctuation.definition.string.end.dnsmasq
+            # single-quote string
+            15: string.quoted.single.dnsmasq
+            16: punctuation.definition.string.begin.dnsmasq
+            17: meta.string-contents.quoted.single.dnsmasq
+            18: punctuation.definition.string.end.dnsmasq
+            # float
+            19: constant.numeric.float.dnsmasq
+            # int
+            20: constant.numeric.integer.dnsmasq
+            # unquoted-string
+            21: string.unquoted.dnsmasq
+          pop: true
+
+  parameter-server:
+    - match: ^({{parameter_server}})(?==|{{comment_eol}})
+      captures:
+        1: entity.name.tag.dnsmasq
+      push:
+        - match: (?={{comment_eol}})
+          pop: true
+        - match: \=
+          scope: keyword.operator.assignment.dnsmasq
+          push:
+            - meta_content_scope: meta.parameter-value.dnsmasq
+            - match: (?={{comment_eol}})
+              pop: true
+            - match: /
+              scope: punctuation.separator.parameter.dnsmasq
+              push:
+                - match: (?={{comment_eol}})
+                  pop: true
+                - include: parameter-server-value-domain
+
+  parameter-server-value-domain:
+    - match: \#(?={{slash_comment_eol}})
+      scope: support.variable.wildcard.dnsmasq
+      push:
+        - match: (?={{comment_eol}})
+          pop: true
+        - include: parameter-server-value-ip
+    - match: (?:({{domain}})|(.+?))(?={{slash_comma_comment_eol}})
+      captures:
+        1: string.unquoted.dnsmasq
+        2: invalid.illegal.domain.dnsmasq
+      push:
+        - match: (,+)?(?={{comment_eol}})
+          captures:
+            1: invalid.illegal.stray-domain-separator.dnsmasq
+          pop: true
+        - match: \,+(?=/)
+          scope: invalid.illegal.stray-domain-separator.dnsmasq
+        - match: \,
+          scope: punctuation.separator.domain.dnsmasq
+          push:
+            - match: (,+)?\s*(?:({{domain}})|(.+?))(?={{slash_comma_comment_eol}})
+              captures:
+                1: invalid.illegal.stray-domain-separator.dnsmasq
+                2: string.unquoted.dnsmasq
+                3: invalid.illegal.domain.dnsmasq
+              pop: true
+        - include: parameter-server-value-ip
+
+  parameter-server-value-ip:
+    - match: /
+      scope: punctuation.separator.parameter.dnsmasq
+      push:
+        - match: (/+)?(?={{comment_eol}})
+          captures:
+            1: invalid.illegal.stray-parameter-separator.dnsmasq
+          pop: true
+        - match: (?:({{ipv4_addr}})|({{ipv6_addr}})|(#)|(.+?))(?={{comment_eol}})
+          captures:
+            1: constant.numeric.integer.dnsmasq
+            2: constant.numeric.integer.long.hexadecimal.dnsmasq
+            3: support.variable.wildcard.dnsmasq
+            4: invalid.illegal.ip.dnsmasq

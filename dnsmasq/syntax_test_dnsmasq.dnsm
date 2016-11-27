@@ -1,0 +1,105 @@
+# SYNTAX TEST "Packages/Config Files/dnsmasq/dnsmasq.sublime-syntax"
+
+# full line comment
+# <- comment.line.dnsmasq punctuation.definition.comment.dnsmasq
+#^^^^^^^^^^^^^^^^^^ comment.line.dnsmasq
+
+all-servers # comment
+# <- entity.name.tag.dnsmasq
+#           ^ comment.line.dnsmasq punctuation.definition.comment.dnsmasq
+#            ^^^^^^^^ comment.line.dnsmasq
+
+all-server # comment
+# <- invalid.illegal.option-parameter.dnsmasq
+#          ^ comment.line.dnsmasq punctuation.definition.comment.dnsmasq
+#           ^^^^^^^^ comment.line.dnsmasq
+
+conf-files=foo, # comment
+# <- invalid.illegal.option-parameter.dnsmasq
+#         ^ keyword.operator.assignment.dnsmasq
+#               ^ comment.line.dnsmasq punctuation.definition.comment.dnsmasq
+#                ^^^^^^^^ comment.line.dnsmasq
+
+conf-file=,"/foo\\e",'/bar', /baz, 34, 1.5,127.0.0.1/24, ::1%lo/24, # comment
+# <- entity.name.tag.dnsmasq
+#        ^ keyword.operator.assignment.dnsmasq
+#         ^ invalid.illegal.stray-parameter-separator.dnsmasq
+#          ^ string.quoted.double.dnsmasq punctuation.definition.string.begin.dnsmasq
+#           ^^^^ string.quoted.double.dnsmasq
+#               ^^^ constant.character.escape.dnsmasq
+#                  ^ string.quoted.double.dnsmasq punctuation.definition.string.end.dnsmasq
+#                   ^ punctuation.separator.parameter.dnsmasq
+#                    ^ string.quoted.single.dnsmasq punctuation.definition.string.begin.dnsmasq
+#                     ^^^^ string.quoted.single.dnsmasq
+#                         ^ string.quoted.single.dnsmasq punctuation.definition.string.end.dnsmasq
+#                          ^ punctuation.separator.parameter.dnsmasq
+#                            ^^^^ string.unquoted.dnsmasq
+#                                ^ punctuation.separator.parameter.dnsmasq
+#                                  ^^ constant.numeric.integer.dnsmasq
+#                                    ^ punctuation.separator.parameter.dnsmasq
+#                                      ^^^ constant.numeric.float.dnsmasq
+#                                         ^ punctuation.separator.parameter.dnsmasq
+#                                          ^^^^^^^^^ constant.numeric.integer.dnsmasq
+#                                                   ^ punctuation.separator.ip.mask.dnsmasq
+#                                                    ^^ constant.numeric.integer.dnsmasq
+#                                                      ^ punctuation.separator.parameter.dnsmasq
+#                                                        ^^^ constant.numeric.integer.long.hexadecimal.dnsmasq
+#                                                           ^ punctuation.separator.ip.ipv6.zone.dnsmasq
+#                                                            ^^ entity.other.attribute-name.dnsmasq
+#                                                              ^ punctuation.separator.ip.mask.dnsmasq
+#                                                               ^^ constant.numeric.integer.dnsmasq
+#                                                                 ^ invalid.illegal.stray-parameter-separator.dnsmasq
+#                                                                   ^ comment.line.dnsmasq punctuation.definition.comment.dnsmasq
+#                                                                    ^^^^^^^^ comment.line.dnsmasq
+
+server=/example.com// # comment
+# <- entity.name.tag.dnsmasq
+#     ^ keyword.operator.assignment.dnsmasq
+#      ^ punctuation.separator.parameter.dnsmasq
+#       ^^^^^^^^^^^ string.unquoted.dnsmasq
+#                  ^ punctuation.separator.parameter.dnsmasq
+#                   ^ invalid.illegal.stray-parameter-separator.dnsmasq
+#                     ^ comment.line.dnsmasq punctuation.definition.comment.dnsmasq
+#                      ^^^^^^^^ comment.line.dnsmasq
+
+server=/example.com,inv@lid,/ # comment
+# <- entity.name.tag.dnsmasq
+#     ^ keyword.operator.assignment.dnsmasq
+#      ^ punctuation.separator.parameter.dnsmasq
+#       ^^^^^^^^^^^ string.unquoted.dnsmasq
+#                  ^ punctuation.separator.domain.dnsmasq
+#                   ^^^^^^^ invalid.illegal.domain.dnsmasq
+#                          ^ invalid.illegal.stray-domain-separator.dnsmasq
+#                           ^ punctuation.separator.parameter.dnsmasq
+#                             ^ comment.line.dnsmasq punctuation.definition.comment.dnsmasq
+#                              ^^^^^^^^ comment.line.dnsmasq
+
+server=/#/# # comment
+# <- entity.name.tag.dnsmasq
+#     ^ keyword.operator.assignment.dnsmasq
+#      ^ punctuation.separator.parameter.dnsmasq
+#       ^ support.variable.wildcard.dnsmasq
+#        ^ punctuation.separator.parameter.dnsmasq
+#         ^ support.variable.wildcard.dnsmasq
+#           ^ comment.line.dnsmasq punctuation.definition.comment.dnsmasq
+#            ^^^^^^^^ comment.line.dnsmasq
+
+server=/#/127.0.0.1 # comment
+# <- entity.name.tag.dnsmasq
+#     ^ keyword.operator.assignment.dnsmasq
+#      ^ punctuation.separator.parameter.dnsmasq
+#       ^ support.variable.wildcard.dnsmasq
+#        ^ punctuation.separator.parameter.dnsmasq
+#         ^^^^^^^^^ constant.numeric.integer.dnsmasq
+#                   ^ comment.line.dnsmasq punctuation.definition.comment.dnsmasq
+#                    ^^^^^^^^ comment.line.dnsmasq
+
+server=/#/::1 # comment
+# <- entity.name.tag.dnsmasq
+#     ^ keyword.operator.assignment.dnsmasq
+#      ^ punctuation.separator.parameter.dnsmasq
+#       ^ support.variable.wildcard.dnsmasq
+#        ^ punctuation.separator.parameter.dnsmasq
+#         ^^^ constant.numeric.integer.long.hexadecimal.dnsmasq
+#             ^ comment.line.dnsmasq punctuation.definition.comment.dnsmasq
+#              ^^^^^^^^ comment.line.dnsmasq
