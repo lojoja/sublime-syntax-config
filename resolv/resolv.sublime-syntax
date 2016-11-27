@@ -1,0 +1,72 @@
+%YAML 1.2
+---
+name: resolv
+file_extensions:
+  # These are non-standard extensions, but used to prevent conflicts with the common `.conf`.
+  # This syntax can be specified per-project with the `Project Specific Syntax Settings` package.
+  - resolv
+scope: source.resolv
+variables:
+  comment_eol: \s+#|$
+  domain: (?:[[:alnum:]][[:alnum:]-]*\.[[:alnum:]-]+)+
+  ipv4_addr: (?:[[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}
+  ipv6cs1: '[[:digit:]A-Fa-f]{1,4}'
+  ipv6cs2: 25[0-5]|2[0-4]d|1dd|[1-9]?d
+  ipv6_addr: (?:(?:{{ipv6cs1}}:){7}(?:{{ipv6cs1}}|:))|(?:(?:{{ipv6cs1}}:){6}(?::{{ipv6cs1}}|(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3})|:))|(?:(?:{{ipv6cs1}}:){5}(?:(?:(?::{{ipv6cs1}}){1,2})|:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3})|:))|(?:(?:{{ipv6cs1}}:){4}(?:(?:(?::{{ipv6cs1}}){1,3})|(?:(?::{{ipv6cs1}})?:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?:(?:{{ipv6cs1}}:){3}(?:(?:(?::{{ipv6cs1}}){1,4})|(?:(?::{{ipv6cs1}}){0,2}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?:(?:{{ipv6cs1}}:){2}(?:(?:(?::{{ipv6cs1}}){1,5})|(?:(?::{{ipv6cs1}}){0,3}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?:(?:{{ipv6cs1}}:){1}(?:(?:(?::{{ipv6cs1}}){1,6})|(?:(?::{{ipv6cs1}}){0,4}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?::(?:(?:(?::{{ipv6cs1}}){1,7})|(?:(?::{{ipv6cs1}}){0,5}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))
+
+contexts:
+  main:
+    - include: comment
+    - include: domain
+    - include: nameserver
+    - include: invalid-type
+
+  comment:
+    - match: \#
+      scope: punctuation.definition.comment.resolv
+      push:
+        - meta_scope: comment.line.resolv
+        - match: $
+          pop: true
+
+  domain:
+    - match: ^(domain)(?:(?={{comment_eol}})|\s+)
+      captures:
+        1: entity.name.tag.resolv
+      push:
+        - meta_scope: meta.value.resolv
+        - match: (?={{comment_eol}})
+          pop: true
+        - match: (?:({{domain}})|(.+?))(?={{comment_eol}})
+          captures:
+            1: string.unquoted.resolv
+            2: invalid.illegal.domain.resolv
+
+  invalid-type:
+    - match: ^(.+?)(?:(?={{comment_eol}})|\s+)
+      captures:
+        1: invalid.illegal.type.resolv
+      push:
+        - meta_scope: meta.value.resolv
+        - match: (?={{comment_eol}})
+          pop: true
+        - match: (?:({{ipv4_addr}})|({{ipv6_addr}})|({{domain}})|(.+?))(?={{comment_eol}})
+          captures:
+            1: constant.numeric.integer.resolv
+            2: constant.numeric.integer.long.hexadecimal.resolv
+            3: string.unquoted.resolv
+            4: invalid.illegal.value.resolv
+
+  nameserver:
+    - match: ^(nameserver)(?:(?={{comment_eol}})|\s+)
+      captures:
+        1: entity.name.tag.resolv
+      push:
+        - meta_scope: meta.value.resolv
+        - match: (?={{comment_eol}})
+          pop: true
+        - match: (?:({{ipv4_addr}})|({{ipv6_addr}})|(.+?))(?={{comment_eol}})
+          captures:
+            1: constant.numeric.integer.resolv
+            2: constant.numeric.integer.long.hexadecimal.resolv
+            3: invalid.illegal.ip-address.resolv

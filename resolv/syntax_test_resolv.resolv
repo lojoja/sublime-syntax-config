@@ -1,0 +1,53 @@
+# SYNTAX TEST "Packages/Config Files/resolv/resolv.sublime-syntax"
+
+# full line comment
+# <- comment.line.resolv punctuation.definition.comment.resolv
+#^^^^^^^^^^^^^^^^^^ comment.line.resolv
+
+domain      example.com # comment
+# <- entity.name.tag.resolv
+#           ^^^^^^^^^^^ string.unquoted.resolv
+#                       ^ comment.line.resolv punctuation.definition.comment.resolv
+#                        ^^^^^^^^ comment.line.resolv
+
+domain      inv@lid  # comment
+# <- entity.name.tag.resolv
+#           ^^^^^^^ invalid.illegal.domain.resolv
+#                    ^ comment.line.resolv punctuation.definition.comment.resolv
+#                     ^^^^^^^^ comment.line.resolv
+
+nameserver  127.0.0.1  # comment
+# <- entity.name.tag.resolv
+#           ^^^^^^^^^ constant.numeric.integer.resolv
+#                      ^ comment.line.resolv punctuation.definition.comment.resolv
+#                       ^^^^^^^^ comment.line.resolv
+
+nameserver  ::1  # comment
+# <- entity.name.tag.resolv
+#           ^^^ constant.numeric.integer.long.hexadecimal.resolv
+#                ^ comment.line.resolv punctuation.definition.comment.resolv
+#                 ^^^^^^^^ comment.line.resolv
+
+nameserver  invalid  # comment
+# <- entity.name.tag.resolv
+#           ^^^^^^^ invalid.illegal.ip-address.resolv
+#                    ^ comment.line.resolv punctuation.definition.comment.resolv
+#                     ^^^^^^^^ comment.line.resolv
+
+invalid     example.com  # comment
+# <- invalid.illegal.type.resolv
+#           ^^^^^^^^^^^ string.unquoted.resolv
+#                        ^ comment.line.resolv punctuation.definition.comment.resolv
+#                         ^^^^^^^^ comment.line.resolv
+
+invalid     127.0.0.1  # comment
+# <- invalid.illegal.type.resolv
+#           ^^^^^^^^^ constant.numeric.integer.resolv
+#                      ^ comment.line.resolv punctuation.definition.comment.resolv
+#                       ^^^^^^^^ comment.line.resolv
+
+invalid     inv@lid  # comment
+# <- invalid.illegal.type.resolv
+#           ^^^^^^^ invalid.illegal.value.resolv
+#                    ^ comment.line.resolv punctuation.definition.comment.resolv
+#                     ^^^^^^^^ comment.line.resolv
