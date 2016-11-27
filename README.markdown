@@ -1,7 +1,7 @@
 Config Files
 ============
 
-*Version 0.0.0*
+*Version 1.0.0*
 
 [Sublime Text](https://www.sublimetext.com) syntax definitions for various configuration file formats.
 
