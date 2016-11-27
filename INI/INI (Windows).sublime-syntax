@@ -1,0 +1,132 @@
+%YAML 1.2
+---
+name: INI (Windows)
+# Windows INI file syntax
+#
+# Notes:
+#   - Full line comments
+#   - Comments begin with `#`
+#   - Parameter key-value assignment with `=`
+#   - No escape characters (e.g. `\n`) in double-quoted strings
+file_extensions:
+  # This is a non-standard extension used only for testing syntaxes.
+  # The generic INI syntax should be preferred over the Windows-specific syntax
+  # for files with the .ini extension.
+  - iniw
+scope: source.ini
+variables:
+  comment_eol: \s+;|$
+  comma_comment_eol: ',|{{comment_eol}}'
+
+contexts:
+  main:
+    - include: comment
+    - include: section
+    - include: parameter
+
+  comment:
+    - match: ^;
+      scope: punctuation.definition.comment.ini
+      push:
+        - meta_scope: comment.line.ini
+        - match: $
+          pop: true
+    - match: ;
+      scope: punctuation.definition.comment.ini
+      push:
+        - meta_scope: invalid.illegal.trailing-comment.ini
+        - match: $
+          pop: true
+
+  section:
+    - match: ^\[
+      scope: punctuation.definition.entity.section.begin.ini
+      push:
+        - meta_scope: entity.name.section.ini
+        - match: \]
+          scope: punctuation.definition.entity.section.end.ini
+          pop: true
+
+  parameter:
+    - match: ^(?:(")([^"]*)(")|([^"=].*?)|(.+?))(?==|{{comment_eol}})
+      captures:
+        # double-quoted key
+        1: punctuation.definition.tag.begin.ini
+        2: entity.name.tag.ini
+        3: punctuation.definition.tag.end.ini
+        # unquoted key
+        4: entity.name.tag.ini
+        # invalid key
+        5: invalid.illegal.key.ini
+      push:
+        - match: (?={{comment_eol}})
+          pop: true
+        - match: \=
+          scope: keyword.operator.assignment.ini
+          push:
+            - meta_content_scope: meta.value.ini
+            - match: (?={{comment_eol}})
+              pop: true
+            - match: \,
+              scope: invalid.illegal.stray-value-separator.ini
+            - include: parameter-value
+
+  parameter-value:
+    - match: |-
+        (?x:
+          ((")([^"]*)("))|
+          ([+-]?[[:digit:]]+\.[[:digit:]]+)|
+          ([+-]?[[:digit:]]+)|
+          ([^"].*?)|
+          (.+?)
+        )(?={{comma_comment_eol}})
+      captures:
+        # double-quote string
+        1: string.quoted.double.ini
+        2: punctuation.definition.string.begin.ini
+        3: meta.string-contents.quoted.double.ini
+        4: punctuation.definition.string.end.ini
+        # float
+        5: constant.numeric.float.ini
+        # int
+        6: constant.numeric.integer.ini
+        # unquoted-string
+        7: string.unquoted.ini
+        # invalid
+        8: invalid.illegal.value.ini
+      push:
+        - match: (,)?(?={{comment_eol}})
+          captures:
+            1: invalid.illegal.stray-value-separator.ini
+          pop: true
+        - include: parameter-value-repeat
+
+  parameter-value-repeat:
+    - match: \,
+      scope: punctuation.separator.value.ini
+      push:
+        - match: |-
+            (,+)?\s*(?x:
+              ((")([^"]*)("))|
+              ([+-]?[[:digit:]]+\.[[:digit:]]+)|
+              ([+-]?[[:digit:]]+)|
+              ([^"].*?)|
+              (.+?)
+            )(?={{comma_comment_eol}})
+          captures:
+            # stray-separator
+            1: invalid.illegal.stray-value-separator.ini
+            # double-quote string
+            2: string.quoted.double.ini
+            3: punctuation.definition.string.begin.ini
+            4: meta.string-contents.quoted.double.ini
+            5: punctuation.definition.string.end.ini
+            # float
+            6: constant.numeric.float.ini
+            # int
+            7: constant.numeric.integer.ini
+            # unquoted-string
+            8: string.unquoted.ini
+            # invalid
+            9: invalid.illegal.value.ini
+          pop: true

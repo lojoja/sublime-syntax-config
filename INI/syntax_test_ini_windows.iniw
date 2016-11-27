@@ -1,0 +1,57 @@
+; SYNTAX TEST "Packages/Config Files/INI/INI (Windows).sublime-syntax"
+
+; comment
+; <- comment.line.ini punctuation.definition.comment.ini
+;^^^^^^^^ comment.line.ini
+
+[section] ; comment
+; <- punctuation.definition.entity.section.begin.ini
+;^^^^^^^ entity.name.section.ini
+;       ^ punctuation.definition.entity.section.end.ini
+;         ^ invalid.illegal.trailing-comment.ini punctuation.definition.comment.ini
+;          ^^^^^^^^ invalid.illegal.trailing-comment.ini
+
+key= ; comment
+; <- entity.name.tag.ini
+;  ^ keyword.operator.assignment.ini
+;    ^ invalid.illegal.trailing-comment.ini punctuation.definition.comment.ini
+;     ^^^^^^^^ invalid.illegal.trailing-comment.ini
+
+"key"= ; comment
+; <- punctuation.definition.tag.begin.ini
+;^^^ entity.name.tag.ini
+;   ^ punctuation.definition.tag.end.ini
+;    ^ keyword.operator.assignment.ini
+;      ^ invalid.illegal.trailing-comment.ini punctuation.definition.comment.ini
+;       ^^^^^^^^ invalid.illegal.trailing-comment.ini
+
+"key= ; comment
+; <- invalid.illegal.key.ini
+;   ^ keyword.operator.assignment.ini
+;     ^ invalid.illegal.trailing-comment.ini punctuation.definition.comment.ini
+;      ^^^^^^^^ invalid.illegal.trailing-comment.ini
+
+=value= ; comment
+; <- invalid.illegal.key.ini
+;     ^ keyword.operator.assignment.ini
+;       ^ invalid.illegal.trailing-comment.ini punctuation.definition.comment.ini
+;        ^^^^^^^^ invalid.illegal.trailing-comment.ini
+
+key=,"foo", -1.0,+5,foo,"foo, ; comment
+; <- entity.name.tag.ini
+;  ^ keyword.operator.assignment.ini
+;   ^ invalid.illegal.stray-value-separator.ini
+;    ^ string.quoted.double.ini punctuation.definition.string.begin.ini
+;     ^^^ string.quoted.double.ini
+;        ^ punctuation.definition.string.end.ini
+;         ^ punctuation.separator.value.ini
+;           ^^^^ constant.numeric.float.ini
+;               ^ punctuation.separator.value.ini
+;                ^^ constant.numeric.integer.ini
+;                  ^ punctuation.separator.value.ini
+;                   ^^^ string.unquoted.ini
+;                      ^ punctuation.separator.value.ini
+;                       ^^^^ invalid.illegal.value.ini
+;                           ^ invalid.illegal.stray-value-separator.ini
+;                             ^ invalid.illegal.trailing-comment.ini punctuation.definition.comment.ini
+;                              ^^^^^^^^ invalid.illegal.trailing-comment.ini

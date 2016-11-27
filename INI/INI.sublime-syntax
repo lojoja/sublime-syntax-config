@@ -1,0 +1,139 @@
+%YAML 1.2
+---
+name: INI
+# Generic INI file syntax
+#
+# Notes:
+#   - Full and partial line comments
+#   - Comments beginning with `;` or `#`
+#   - Parameter key-value assignment with `=` or `:`
+#   - Common escape characters (e.g. `\n`) in double-quoted strings
+file_extensions:
+  - ini
+  - cfg
+scope: source.ini
+variables:
+  comment_eol: \s+[#;]|$
+  comma_comment_eol: ',|{{comment_eol}}'
+  escape_chars: '\\(?:[\\0abfnrtv;#=:"]|x[[:xdigit:]]+|\d{1,3})'
+
+contexts:
+  main:
+    - include: comment
+    - include: section
+    - include: parameter
+
+  comment:
+    - match: '[#|;]'
+      scope: punctuation.definition.comment.ini
+      push:
+        - meta_scope: comment.line.ini
+        - match: $
+          pop: true
+
+  section:
+    - match: ^\[
+      scope: punctuation.definition.entity.section.begin.ini
+      push:
+        - meta_scope: entity.name.section.ini
+        - match: \]
+          scope: punctuation.definition.entity.section.end.ini
+          pop: true
+
+  parameter:
+    - match: ^(?:(")([^"]*)(")|([^"'=:].*?)|(.+?))(?=[=:]|{{comment_eol}})
+      captures:
+        # double-quoted key
+        1: punctuation.definition.tag.begin.ini
+        2: entity.name.tag.ini
+        3: punctuation.definition.tag.end.ini
+        # unquoted key
+        4: entity.name.tag.ini
+        # invalid key
+        5: invalid.illegal.key.ini
+      push:
+        - match: (?={{comment_eol}})
+          pop: true
+        - match: '[=:]'
+          scope: keyword.operator.assignment.ini
+          push:
+            - meta_content_scope: meta.value.ini
+            - match: (?={{comment_eol}})
+              pop: true
+            - match: \,
+              scope: invalid.illegal.stray-value-separator.ini
+            - include: parameter-value
+
+  parameter-value:
+    - match: |-
+        (?x:
+          ((")(({{escape_chars}})|[^"])*("))|
+          ((')([^']*)('))|
+          ([+-]?[[:digit:]]+\.[[:digit:]]+)|
+          ([+-]?[[:digit:]]+)|
+          ([^"'].*?)|
+          (.+?)
+        )(?={{comma_comment_eol}})
+      captures:
+        # double-quote string
+        1: string.quoted.double.ini
+        2: punctuation.definition.string.begin.ini
+        3: meta.string-contents.quoted.double.ini
+        4: constant.character.escape.ini
+        5: punctuation.definition.string.end.ini
+        # single-quote string
+        6: string.quoted.single.ini
+        7: punctuation.definition.string.begin.ini
+        8: meta.string-contents.quoted.single.ini
+        9: punctuation.definition.string.end.ini
+        # float
+        10: constant.numeric.float.ini
+        # int
+        11: constant.numeric.integer.ini
+        # unquoted-string
+        12: string.unquoted.ini
+        # invalid
+        13: invalid.illegal.value.ini
+      push:
+        - match: (,)?(?={{comment_eol}})
+          captures:
+            1: invalid.illegal.stray-value-separator.ini
+          pop: true
+        - include: parameter-value-repeat
+
+  parameter-value-repeat:
+    - match: \,
+      scope: punctuation.separator.value.ini
+      push:
+        - match: |-
+            (,+)?\s*(?x:
+              ((")(({{escape_chars}})|[^"])*("))|
+              ((')([^']*)('))|
+              ([+-]?[[:digit:]]+\.[[:digit:]]+)|
+              ([+-]?[[:digit:]]+)|
+              ([^"'].+?)|
+              (.+?)
+            )(?={{comma_comment_eol}})
+          captures:
+            # stray-separator
+            1: invalid.illegal.stray-value-separator.ini
+            # double-quote string
+            2: string.quoted.double.ini
+            3: punctuation.definition.string.begin.ini
+            4: meta.string-contents.quoted.double.ini
+            5: constant.character.escape.ini
+            6: punctuation.definition.string.end.ini
+            # single-quote string
+            7: string.quoted.single.ini
+            8: punctuation.definition.string.begin.ini
+            9: meta.string-contents.quoted.single.ini
+            10: punctuation.definition.string.end.ini
+            # float
+            11: constant.numeric.float.ini
+            # int
+            12: constant.numeric.integer.ini
+            # unquoted-string
+            13: string.unquoted.ini
+            # invalid
+            14: invalid.illegal.value.ini
+          pop: true
