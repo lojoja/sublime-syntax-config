@@ -1,0 +1,60 @@
+%YAML 1.2
+---
+name: hosts
+file_extensions:
+  # These are non-standard extensions, but used to prevent conflicts with the common `.conf`.
+  # This syntax can be specified per-project with the `Project Specific Syntax Settings` package.
+  - hosts
+scope: source.hosts
+variables:
+  comment_eol: \s+#|$
+  comma_comment_eol: ',|{{comment_eol}}'
+  hostname: (?:[[:alnum:]](?:[[:alnum:]-]*\.[[:alnum:]-]+)?)+
+  ipv4_addr: (?:[[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}
+  ipv6cs1: '[[:digit:]A-Fa-f]{1,4}'
+  ipv6cs2: 25[0-5]|2[0-4]d|1dd|[1-9]?d
+  ipv6_addr: (?:(?:{{ipv6cs1}}:){7}(?:{{ipv6cs1}}|:))|(?:(?:{{ipv6cs1}}:){6}(?::{{ipv6cs1}}|(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3})|:))|(?:(?:{{ipv6cs1}}:){5}(?:(?:(?::{{ipv6cs1}}){1,2})|:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3})|:))|(?:(?:{{ipv6cs1}}:){4}(?:(?:(?::{{ipv6cs1}}){1,3})|(?:(?::{{ipv6cs1}})?:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?:(?:{{ipv6cs1}}:){3}(?:(?:(?::{{ipv6cs1}}){1,4})|(?:(?::{{ipv6cs1}}){0,2}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?:(?:{{ipv6cs1}}:){2}(?:(?:(?::{{ipv6cs1}}){1,5})|(?:(?::{{ipv6cs1}}){0,3}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?:(?:{{ipv6cs1}}:){1}(?:(?:(?::{{ipv6cs1}}){1,6})|(?:(?::{{ipv6cs1}}){0,4}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))|(?::(?:(?:(?::{{ipv6cs1}}){1,7})|(?:(?::{{ipv6cs1}}){0,5}:(?:(?:{{ipv6cs2}})(?:\.(?:{{ipv6cs2}})){3}))|:))
+
+contexts:
+  main:
+    - include: comment
+    - include: ip-hostname-map
+
+  comment:
+    - match: \#
+      scope: punctuation.definition.comment.hosts
+      push:
+        - meta_scope: comment.line.hosts
+        - match: $
+          pop: true
+
+  ip-hostname-map:
+    - match: ^(?:({{ipv4_addr}})|({{ipv6_addr}})|(.+?))(?:(?={{comment_eol}})|\s+)
+      captures:
+        1: constant.numeric.integer.hosts
+        2: constant.numeric.integer.long.hexadecimal.hosts
+        3: invalid.illegal.ip-address.hosts
+      push:
+        - match: (?={{comment_eol}})
+          pop: true
+        - include: host
+
+  host:
+    - match: (?:({{hostname}})|(.+?))(?={{comma_comment_eol}})
+      captures:
+        1: string.unquoted.hosts
+        2: invalid.illegal.hostname.hosts
+      push:
+        - match: (,+)?(?={{comment_eol}})
+          captures:
+            1: invalid.illegal.stray-hostname-separator.hosts
+          pop: true
+        - match: \,
+          scope: punctuation.separator.hostname.hosts
+          push:
+            - match: (,+)?\s*(?:({{hostname}})|(.+?))(?={{comma_comment_eol}})
+              captures:
+                1: invalid.illegal.stray-hostname-separator.hosts
+                2: string.unquoted.hosts
+                3: invalid.illegal.hostname.hosts
+              pop: true

@@ -1,0 +1,39 @@
+# SYNTAX TEST "Packages/Config Files/hosts/hosts.sublime-syntax"
+
+# full line comment
+# <- comment.line.hosts punctuation.definition.comment.hosts
+#^^^^^^^^^^^^^^^^^^ comment.line.hosts
+
+127.0.0.1   example.com, www.example.com,sub.example.com # comment
+# <- constant.numeric.integer.hosts
+#           ^^^^^^^^^^^ string.unquoted.hosts
+#                      ^ punctuation.separator.hostname.hosts
+#                        ^^^^^^^^^^^^^^^ string.unquoted.hosts
+#                                       ^ punctuation.separator.hostname.hosts
+#                                        ^^^^^^^^^^^^^^^ string.unquoted.hosts
+#                                                        ^ comment.line.hosts punctuation.definition.comment.hosts
+#                                                         ^^^^^^^^ comment.line.hosts
+
+::1         ex@mp le, example.com,,www.example.com, # comment
+# <- constant.numeric.integer.long.hexadecimal.hosts
+#           ^^^^^^^^ invalid.illegal.hostname.hosts
+#                   ^ punctuation.separator.hostname.hosts
+#                     ^^^^^^^^^^^ string.unquoted.hosts
+#                                ^ punctuation.separator.hostname.hosts
+#                                 ^ invalid.illegal.stray-hostname-separator.hosts
+#                                  ^^^^^^^^^^^^^^^ string.unquoted.hosts
+#                                                 ^ invalid.illegal.stray-hostname-separator.hosts
+#                                                   ^ comment.line.hosts punctuation.definition.comment.hosts
+#                                                    ^^^^^^^^ comment.line.hosts
+
+invalid     example.com # comment
+# <- invalid.illegal.ip-address.hosts
+#           ^^^^^^^^^^^ string.unquoted.hosts
+#                       ^ comment.line.hosts punctuation.definition.comment.hosts
+#                        ^^^^^^^^ comment.line.hosts
+
+invalid     ex@mp le # comment
+# <- invalid.illegal.ip-address.hosts
+#           ^^^^^^^^ invalid.illegal.hostname.hosts
+#                    ^ comment.line.hosts punctuation.definition.comment.hosts
+#                     ^^^^^^^^ comment.line.hosts
