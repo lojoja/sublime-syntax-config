@@ -1,0 +1,228 @@
+%YAML 1.2
+---
+name: Windows Registry
+file_extensions:
+  - reg
+first_line_match: REGEDIT4|Windows Registry Editor Version 5.00
+scope: source.winreg
+variables:
+  escape_char: '\\[\\"]'
+  header: REGEDIT4|Windows Registry Editor Version 5.00
+  hive: HKEY_(?:C(?:LASSES_ROOT|URRENT_(?:CONFIG|USER))|(?:DYN|PERFORMANCE)_DATA|LOCAL_MACHINE|USERS)
+  value_dword: dword
+  value_hex1: hex(?:\([12378a]\))?
+  value_hex2: hex\([45]\)
+  value_hex3: hex\(b\)
+
+contexts:
+  main:
+    - match: ^(({{header}})\s*)$
+      captures:
+        1: meta.preprocessor.winreg
+        2: keyword.header.winreg
+      set:
+        - meta_scope: meta.registration-file.winreg
+        - include: comment
+        - include: path
+        - include: value
+
+  #
+  # Generic Matches
+  #
+  comment:
+    - match: ^;
+      scope: punctuation.definition.comment.winreg
+      push:
+        - meta_scope: comment.line.winreg
+        - match: $
+          pop: true
+
+  hex-character-pair:
+    - match: ([[:xdigit:]]{2})(?:(,)(?!$)|(?=$))
+      captures:
+        1: constant.numeric.integer.hexadecimal.winreg
+        2: punctuation.separator.value.winreg
+
+  #
+  # Registry Path
+  #
+  path:
+    - match: ^\[
+      scope: punctuation.definition.path.begin.winreg
+      push:
+        - meta_content_scope: meta.path.winreg
+        - include: hive
+        - match: \]
+          scope: punctuation.definition.path.end.winreg
+          pop: true
+
+  hive:
+    - match: (-)?({{hive}})(?=[\\\]]|$)
+      captures:
+        1: keyword.operator.delete.winreg
+        2: constant.language.hive.winreg
+      push:
+        - include: sub-path
+    - match: (-)?([^\\\]]+)(?=[\\\]]|$)
+      captures:
+        1: keyword.operator.delete.winreg
+        2: invalid.illegal.hive.winreg
+      push:
+        - include: sub-path
+
+  sub-path:
+    - match: (?=\]|$)
+      pop: true
+    - match: (\\)([^\n\\\]]+)
+      captures:
+        1: punctuation.separator.path.winreg
+        2: entity.name.tag.winreg
+
+  #
+  # Value Name
+  #
+  value:
+    - include: named-value
+    - include: default-value
+    - match: '[^=]+(?==)'
+      scope: invalid.illegal.value-name.winreg
+
+  default-value:
+    - match: ^@(?==|$)
+      scope: support.variable.default-value.winreg
+      push:
+        - match: (?=$)
+          pop: true
+        - match: \=
+          scope: keyword.operator.assignment.winreg
+          push:
+            - match: (?=$)
+              pop: true
+            - include: default-value-data
+
+  named-value:
+    - match: ^(")([^"]*)(")(?=|$)
+      captures:
+        1: punctuation.definition.value-name.begin.winreg
+        2: entity.name.tag.winreg
+        3: punctuation.definition.value-name.end.winreg
+      push:
+        - match: (?=$)
+          pop: true
+        - match: \=
+          scope: keyword.operator.assignment.winreg
+          push:
+            - match: (?=$)
+              pop: true
+            - include: named-value-data
+
+  #
+  # Value Data Types
+  #
+  default-value-data:
+    - include: delete-data
+    - include: string-data-type
+    - include: invalid-data-value
+
+  named-value-data:
+    - include: delete-data
+    - include: dword-data-type
+    - include: hex12378a-data-type
+    - include: hex45-data-type
+    - include: hexb-data-type
+    - include: string-data-type
+    - match: '[^:]+(?=:|$)'
+      scope: invalid.illegal.data-type.winreg
+      pop: true
+
+  delete-data:
+    - match: \-(?=$)
+      scope: keyword.operator.delete.winreg
+
+  dword-data-type:
+    - match: '{{value_dword}}(?=:|$)'
+      scope: storage.type.winreg
+      push:
+        - match: (?=$)
+          pop: true
+        - match: ':'
+          scope: punctuation.separator.type.winreg
+          push:
+            - match: (?=$)
+              pop: true
+            - match: '[[:xdigit:]]{8}(?=$)'
+              scope: constant.numeric.integer.hexadecimal.winreg
+            - include: invalid-data-value
+
+  hex12378a-data-type:
+    - match: '{{value_hex1}}(?=:|$)'
+      scope: storage.type.winreg
+      push:
+        - match: (?=$)
+          pop: true
+        - match: ':'
+          scope: punctuation.separator.type.winreg
+          push:
+            - match: (?=$)
+              pop: true
+            - match: (\\)(.*)$\r?\n?
+              captures:
+                1: punctuation.separator.continuation.line.winreg
+                2: invalid.illegal.unexpected-text.winreg
+              push:
+                - match: (?=\S)
+                  pop: true
+            - include: hex-character-pair
+            - include: invalid-data-value
+
+  hex45-data-type:
+    - match: '{{value_hex2}}(?=:|$)'
+      scope: storage.type.winreg
+      push:
+        - match: (?=$)
+          pop: true
+        - match: ':'
+          scope: punctuation.separator.type.winreg
+          push:
+            - match: (?=$)
+              pop: true
+            - match: (?=(?:[[:xdigit:]]{2},){3}[[:xdigit:]]{2}$)
+              push:
+                - match: (?=$)
+                  pop: true
+                - include: hex-character-pair
+            - include: invalid-data-value
+
+  hexb-data-type:
+    - match: '{{value_hex3}}(?=:|$)'
+      scope: storage.type.winreg
+      push:
+        - match: (?=$)
+          pop: true
+        - match: ':'
+          scope: punctuation.separator.type.winreg
+          push:
+            - match: (?=$)
+              pop: true
+            - match: (?=(?:[[:xdigit:]]{2},){7}[[:xdigit:]]{2}$)
+              push:
+                - match: (?=$)
+                  pop: true
+                - include: hex-character-pair
+            - include: invalid-data-value
+
+  invalid-data-value:
+    - match: .+(?=$)
+      scope: invalid.illegal.data-value.winreg
+
+  string-data-type:
+    - match: \"
+      scope: punctuation.definition.string.begin.winreg
+      push:
+        - meta_scope: string.quoted.double.winreg
+        - meta_content_scope: meta.string-contents.quoted.double.winreg
+        - match: '{{escape_char}}'
+          scope: constant.character.escape.winreg
+        - match: \"
+          scope: punctuation.definition.string.end.winreg
+          pop: true

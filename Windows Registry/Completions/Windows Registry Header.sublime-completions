@@ -1,0 +1,9 @@
+{
+  "scope": "source.winreg -meta.registration-file.winreg",
+
+  "completions":
+  [
+    "REGEDIT4",
+    "Windows Registry Editor Version 5.00"
+  ]
+}

@@ -1,0 +1,114 @@
+; SYNTAX TEST "Packages/Config Files/Windows Registry/Windows Registry.sublime-syntax"
+
+Windows Registry Editor Version 5.00
+;^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.preprocessor.winreg keyword.header.winreg
+
+; comment
+; <- comment.line.winreg punctuation.definition.comment.winreg
+;^^^^^^^^ comment.line.winreg
+
+[-HKEY_CURRENT_USER\SOFTWARE\Wow6432Node]
+; <- punctuation.definition.path.begin.winreg
+;^ keyword.operator.delete.winreg
+; ^^^^^^^^^^^^^^^^^ constant.language.hive.winreg
+;                  ^ punctuation.separator.path.winreg
+;                   ^^^^^^^^ entity.name.tag.winreg
+;                           ^ punctuation.separator.path.winreg
+;                            ^^^^^^^^^^^ entity.name.tag.winreg
+;                                       ^ punctuation.definition.path.end.winreg
+
+[HKEY_CURRENT_USR\SOFTWARE\Wow6432Node]
+;^^^^^^^^^^^^^^^^ invalid.illegal.hive.winreg
+
+; comment
+; <- comment.line.winreg punctuation.definition.comment.winreg
+;^^^^^^^^ comment.line.winreg
+
+@=-
+; <- support.variable.default-value.winreg
+;^ keyword.operator.assignment.winreg
+; ^ keyword.operator.delete.winreg
+
+@="data"
+; ^ punctuation.definition.string.begin.winreg
+; ^^^^^^ string.quoted.double.winreg
+;      ^ punctuation.definition.string.end.winreg
+
+@=invalid
+; ^^^^^^^ invalid.illegal.data-value.winreg
+
+"name"=-
+; <- punctuation.definition.value-name.begin.winreg
+;^^^^ entity.name.tag.winreg
+;    ^ punctuation.definition.value-name.end.winreg
+;     ^ keyword.operator.assignment.winreg
+;      ^ keyword.operator.delete.winreg
+
+"name"=dword:00000000
+;      ^^^^^ storage.type.winreg
+;           ^ punctuation.separator.type.winreg
+;            ^^^^^^^^ constant.numeric.integer.hexadecimal.winreg
+
+"name"=dword:invalid
+;            ^^^^^^^ invalid.illegal.data-value.winreg
+
+"name"=hex(1):00,00,00,00,\
+;      ^^^^^^ storage.type.winreg
+;             ^^ constant.numeric.integer.hexadecimal.winreg
+;               ^ punctuation.separator.value.winreg
+;                ^^ constant.numeric.integer.hexadecimal.winreg
+;                  ^ punctuation.separator.value.winreg
+;                   ^^ constant.numeric.integer.hexadecimal.winreg
+;                     ^ punctuation.separator.value.winreg
+;                      ^^ constant.numeric.integer.hexadecimal.winreg
+;                        ^ punctuation.separator.value.winreg
+;                         ^ punctuation.separator.continuation.line.winreg
+
+"name"=hex(1):00,\
+  00
+; ^^ constant.numeric.integer.hexadecimal.winreg
+
+"name"=hex(4):00,00,00,00
+;      ^^^^^^ storage.type.winreg
+;             ^^ constant.numeric.integer.hexadecimal.winreg
+;               ^ punctuation.separator.value.winreg
+;                ^^ constant.numeric.integer.hexadecimal.winreg
+;                  ^ punctuation.separator.value.winreg
+;                   ^^ constant.numeric.integer.hexadecimal.winreg
+;                     ^ punctuation.separator.value.winreg
+;                      ^^ constant.numeric.integer.hexadecimal.winreg
+
+"name"=hex(4):00,00
+;             ^^^^^ invalid.illegal.data-value.winreg
+
+"name"=hex(b):00,00,00,00,00,00,00,00
+;      ^^^^^^ storage.type.winreg
+;             ^^ constant.numeric.integer.hexadecimal.winreg
+;               ^ punctuation.separator.value.winreg
+;                ^^ constant.numeric.integer.hexadecimal.winreg
+;                  ^ punctuation.separator.value.winreg
+;                   ^^ constant.numeric.integer.hexadecimal.winreg
+;                     ^ punctuation.separator.value.winreg
+;                      ^^ constant.numeric.integer.hexadecimal.winreg
+;                        ^ punctuation.separator.value.winreg
+;                         ^^ constant.numeric.integer.hexadecimal.winreg
+;                           ^ punctuation.separator.value.winreg
+;                            ^^ constant.numeric.integer.hexadecimal.winreg
+;                              ^ punctuation.separator.value.winreg
+;                               ^^ constant.numeric.integer.hexadecimal.winreg
+;                                 ^ punctuation.separator.value.winreg
+;                                  ^^ constant.numeric.integer.hexadecimal.winreg
+
+"name"=hex(b):00,00
+;             ^^^^^ invalid.illegal.data-value.winreg
+
+"name"="value"
+;      ^ string.quoted.double.winreg punctuation.definition.string.begin.winreg
+;       ^^^^^ string.quoted.double.winreg meta.string-contents.quoted.double.winreg
+;            ^ string.quoted.double.winreg punctuation.definition.string.end.winreg
+
+name=hex:00,00,00,00
+; <- invalid.illegal.value-name.winreg
+
+"name"=invalid:00,00,00,00
+;      ^^^^^^^ invalid.illegal.data-type.winreg

@@ -1,0 +1,21 @@
+{
+  "scope": "source.winreg meta.path.winreg",
+
+  "completions":
+  [
+    "HKEY_CLASSES_ROOT",
+    "HKEY_CURRENT_CONFIG",
+    "HKEY_CURRENT_USER",
+    "HKEY_DYN_DATA",
+    "HKEY_PERFORMANCE_DATA",
+    "HKEY_LOCAL_MACHINE",
+    "HKEY_USERS",
+    { "trigger": "HKCR", "contents": "HKEY_CLASSES_ROOT" },
+    { "trigger": "HKCC", "contents": "HKEY_CURRENT_CONFIG" },
+    { "trigger": "HKCU", "contents": "HKEY_CURRENT_USER" },
+    { "trigger": "HKDD", "contents": "HKEY_DYN_DATA" },
+    { "trigger": "HKPD", "contents": "HKEY_PERFORMANCE_DATA" },
+    { "trigger": "HKLM", "contents": "HKEY_LOCAL_MACHINE" },
+    { "trigger": "HKU", "contents": "HKEY_USERS" }
+  ]
+}

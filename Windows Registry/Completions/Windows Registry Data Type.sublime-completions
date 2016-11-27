@@ -1,0 +1,18 @@
+{
+  "scope": "source.winreg invalid.illegal.data-type.winreg",
+
+  "completions":
+  [
+    { "trigger": "dword", "contents": "dword:${1:0}${2:0}${3:0}${4:0}${5:0}${6:0}${7:0}${8:0}" },
+    { "trigger": "hex", "contents": "hex:${1:0}${2:0}" },
+    { "trigger": "hex(1)", "contents": "hex(1):${1:0}${2:0}" },
+    { "trigger": "hex(2)", "contents": "hex(1):${1:0}${2:0}" },
+    { "trigger": "hex(3)", "contents": "hex(1):${1:0}${2:0}" },
+    { "trigger": "hex(7)", "contents": "hex(1):${1:0}${2:0}" },
+    { "trigger": "hex(8)", "contents": "hex(1):${1:0}${2:0}" },
+    { "trigger": "hex(a)", "contents": "hex(1):${1:0}${2:0}" },
+    { "trigger": "hex(4)", "contents": "hex(4):${1:0}${2:0},${3:0}${4:0},${5:0}${6:0},${7:0}${8:0}" },
+    { "trigger": "hex(5)", "contents": "hex(4):${1:0}${2:0},${3:0}${4:0},${5:0}${6:0},${7:0}${8:0}" },
+    { "trigger": "hex(b)", "contents": "hex(4):${1:0}${2:0},${3:0}${4:0},${5:0}${6:0},${7:0}${8:0},${9:0}${10:0},${11:0}${12:0},${13:0}${14:0},${15:0}${16:0}" }
+  ]
+}
