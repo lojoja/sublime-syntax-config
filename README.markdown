@@ -17,12 +17,21 @@ Syntax definitions include:
 To manage this package with [Package Control](https://packagecontrol.io), add the [lojoja pcrepo](https://github.com/lojoja/sublime-pcrepo).
 
 
+Requirements
+------------
+
+- Sublime Text 3 build 3048+
+
+
 Installation
 ------------
 ### Package Control
 1. Open the Sublime Text Command Palette
-2. Select `Package Control: Install Package`
-3. Search for `Config Files`
+2. Select `Package Control: Add Repository`
+3. Enter the URL: `https://raw.githubusercontent.com/lojoja/sublime-pcrepo/master/repository.json`
+4. Open the Sublime Text Command Palette
+5. Select `Package Control: Install Package`
+6. Search for `Config Files`
 
 
 ### Git
@@ -37,3 +46,9 @@ Installation
 3. Change the extracted folder name to `Config Files`
 4. Open the Sublime Text `Packages` directory with the `Preferences > Browse Packages…` menu item
 5. Copy the `Config Files` folder to the `Packages` directory
+
+
+License
+-------
+
+Config Files is released under the [MIT License](./LICENSE)
